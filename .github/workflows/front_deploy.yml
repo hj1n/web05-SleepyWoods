@@ -30,4 +30,7 @@ jobs:
 
       - name: Client 소스 빌드
         working-directory: "./frontend"
-        run: npm build
+        run: npm run build
+
+      - name: 출력 테스트
+        run: ls
