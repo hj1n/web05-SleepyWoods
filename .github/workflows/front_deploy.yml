@@ -32,5 +32,15 @@ jobs:
         working-directory: "./frontend"
         run: npm run build
 
-      - name: 출력 테스트
-        run: ls
+      - name: Deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            whoami
+            ls
+
