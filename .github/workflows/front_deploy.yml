@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "frontend/**"
 
 jobs:
   build-image:
@@ -23,7 +21,7 @@ jobs:
         id: cache
         with:
           path: "**/frontend/node_modules"
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/client/yarn.lock') }}
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/frontend/package-lock.json') }}
 
       - name: node_modules 폴더 캐시가 없다면 dependencies 설치
         working-directory: "./frontend"
@@ -31,5 +29,5 @@ jobs:
         run: npm install
 
       - name: Client 소스 빌드
-        working-directory: "./client"
+        working-directory: "./frontend"
         run: npm build
