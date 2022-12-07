@@ -32,14 +32,25 @@ jobs:
         working-directory: "./frontend"
         run: npm run build
 
-      - name: Deploy
-        uses: appleboy/ssh-action@v0.1.4
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            whoami
-            ls
 
+      
+      - name: Publish
+        uses: nogsantos/scp-deploy@master
+        with:
+          src: ./frontend/dist/*
+          host: ${{ secrets.SSH_HOST }}
+          remote: ${{ secrets.SSH_DIR }}
+          port: ${{ secrets.SSH_PORT }}
+          user: ${{ secrets.SSH_USER }}
+          password: ${{ secrets.SSH_PASSWORD }}
+
+#       - name: Deploy
+#         uses: appleboy/ssh-action@v0.1.4
+#         with:
+#           host: ${{ secrets.SSH_HOST }}
+#           username: ${{ secrets.SSH_USER }}
+#           password: ${{ secrets.SSH_PASSWORD }}
+#           port: ${{ secrets.SSH_PORT }}
+#           script: |
+#             whoami
+#             ls
