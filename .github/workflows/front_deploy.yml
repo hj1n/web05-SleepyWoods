@@ -1,46 +1,35 @@
-name: deploy
-
-# action 트리거 조건 (release 브랜치에 푸쉬될 때)
+name: release-client CI/CD
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      - "frontend/**"
 
-# action 동작
 jobs:
-  # OS 환경
-  build:
-    runs-on: ubuntu-lastest
-    
-    # 경고 무시
-    env: 
-      working-directory: ./frontend
-
-    # Nodejs 런타임 정보 설정
-    strategy:
-      matrix:
-        node-version: [16.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+  build-image:
+    name: CI/CD
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v2
+
+      - name: Node 설정
+        uses: actions/setup-node@v1
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
-      - name: Install modules
+          node-version: "18.x"
+
+      - name: node_modules 폴더 캐싱
+        uses: actions/cache@v2
+        id: cache
+        with:
+          path: "**/frontend/node_modules"
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/client/yarn.lock') }}
+
+      - name: node_modules 폴더 캐시가 없다면 dependencies 설치
+        working-directory: "./frontend"
+        if: steps.cache.outputs.cache-hit != 'true'
         run: npm install
-        working-directory: ${{ env. working-directory }}
-      - name: Build project
-        run: npm run build
-        working-directory: ${{ env. working-directory }}
-#       - name: Deploy build outputs
-#         uses: appleboy/scp-action@master
-#         with:
-#           host: ${{ secrets.HOST }}
-#           username: ${{ secrets.USERNAME }}
-#           key: ${{ secrets.SSH_PEM_KEY }}
-#           port: ${{ secrets.PORT }}
-#           source: "build/*"
-#           strip_components: 1
-#           target: "/var/www/html"
+
+      - name: Client 소스 빌드
+        working-directory: "./client"
+        run: npm build
