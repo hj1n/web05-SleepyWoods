@@ -42,7 +42,7 @@ jobs:
           remote: ${{ secrets.SSH_DIR }}
           port: ${{ secrets.SSH_PORT }}
           user: ${{ secrets.SSH_USER }}
-          password: ${{ secrets.SSH_PASSWORD }}
+          key: ${{ secrets.SSH_KEY }}
 
 #       - name: Deploy
 #         uses: appleboy/ssh-action@v0.1.4
