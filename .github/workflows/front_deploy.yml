@@ -1,41 +1,35 @@
-name: front build and deploy # Workflow 이름
-on: # deploy Branch에서 push 이벤트가 일어났을 때만 실행
-  pull_request:
+
+name: deploy
+on:
+  push:
     branches: [main]
 
 jobs:
   build:
-    runs-on: ubuntu-18.04 # Job 가상환경 인스턴스
-    steps: # Steps
-      - name: Checkout source code. # 레포지토리 체크아웃
-        uses: actions/checkout@deploy
+    runs-on: ubuntu-latest
 
-      - name: Front Folder Enter # 의존 파일 설치
-        run: cd frontend
-        
-      - name: Install Dependencies # 의존 파일 설치
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+          
+      - name: cd front
+        run: cd frontend  
+      - name: Install modules
         run: npm install
 
-      - name: Build # React Build
+      - name: Build project
         run: npm run build
-
-#       - name: executing remote ssh commands using password
-#         uses: appleboy/ssh-action@deploy
+#       - name: Deploy build outputs
+#         uses: appleboy/scp-action@master
 #         with:
 #           host: ${{ secrets.HOST }}
 #           username: ${{ secrets.USERNAME }}
-#           password: ${{ secrets.PASSWORD }}
+#           key: ${{ secrets.SSH_PEM_KEY }}
 #           port: ${{ secrets.PORT }}
-#           script: |
-#             rm -rf /var/www/newSecu/back/views/*
-#             cp /var/www/newSecu/.htaccess /var/www/newSecu/back/views    # react에서 새로고침 시 404 뜨는 오류 해결
-
-#       - name: copy file via ssh password
-#         uses: appleboy/scp-action@deploy
-#         with:
-#           host: ${{ secrets.HOST }}
-#           username: ${{ secrets.USERNAME }}
-#           password: ${{ secrets.PASSWORD }}
-#           port: ${{ secrets.PORT }}
-#           source: 'views'
-#           target: '/var/www/newSecu/back'
+#           source: "build/*"
+#           strip_components: 1
+#           target: "/var/www/html"
